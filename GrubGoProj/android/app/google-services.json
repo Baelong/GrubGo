@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "813512056561",
+    "project_id": "grubgo-152ca",
+    "storage_bucket": "grubgo-152ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813512056561:android:ac0306cba196b6324e1350",
+        "android_client_info": {
+          "package_name": "com.example.grubgoproj"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN_ADQAdpKJEj6B5y8auf2-Va2VZp3QGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
