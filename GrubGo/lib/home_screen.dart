@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'LoginPage.dart';
+import 'MenuPage.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,8 +13,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Stream<QuerySnapshot> _getUserStream() {
-    return _firestore.collection('users').snapshots();
+  Stream<QuerySnapshot> _getRestaurantStream() {
+    return _firestore.collection('restaurants').snapshots();
   }
 
   void _signOut() async {
@@ -34,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _getUserStream(),
+        stream: _getRestaurantStream(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Something went wrong'));
@@ -42,13 +43,113 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
-          final users = snapshot.data!.docs;
+          final restaurants = snapshot.data!.docs;
           return ListView.builder(
-            itemCount: users.length,
+            itemCount: restaurants.length,
             itemBuilder: (context, index) {
-              final user = users[index];
-              return ListTile(
-                title: Text(user['email']),
+              final restaurant = restaurants[index];
+              final imageUrl = restaurant['image_url'] ?? 'https://via.placeholder.com/150';
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MenuPage(
+                            restaurantId: restaurant.id,
+                            restaurantName: restaurant['name'],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.network(
+                          imageUrl,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            print('Failed to load image: $imageUrl');
+                            return Image.network(
+                              'https://via.placeholder.com/150',
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                restaurant['name'],
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                restaurant['cuisine'],
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    restaurant['address'],
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: Colors.amber,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    restaurant['rating'].toString(),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               );
             },
           );
