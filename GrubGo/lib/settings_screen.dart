@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:grubgo/addresses_screen.dart';
+import 'package:grubgo/country_selection_screen.dart';
 import 'LoginPage.dart';
 import 'profile_screen.dart';
 import 'change_password_screen.dart';
 import 'change_email_screen.dart';
+import 'payment_options_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -30,7 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text('Profile', style: TextStyle(color: Colors.black)),
+        title: Text('Settings', style: TextStyle(color: Colors.black)),
         centerTitle: true,
         elevation: 0,
       ),
@@ -71,8 +74,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SizedBox(height: 30),
                 _buildSectionTitle('Account'),
                 _buildSettingsButton(context, 'Profile', Icons.edit, _navigateToProfile),
-                _buildSettingsButton(context, 'Change Password', Icons.lock, _navigateToChangePassword),
                 _buildSettingsButton(context, 'Change Email', Icons.email, _navigateToChangeEmail),
+                _buildSettingsButton(context, 'Change Password', Icons.lock, _navigateToChangePassword),
                 _buildSettingsButton(context, 'Addresses', Icons.location_on, _navigateToAddresses),
                 _buildSettingsButton(context, 'Payment Options', Icons.payment, _navigateToPaymentOptions),
                 _buildSettingsButton(context, 'Order History', Icons.history, _navigateToOrderHistory),
@@ -147,11 +150,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _navigateToPaymentOptions(BuildContext context) {
-    // Navigate to Payment Options Page
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => PaymentOptionsScreen()));
   }
 
   void _navigateToCountry(BuildContext context) {
-    // Navigate to Country Page
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => CountrySelectionScreen()));
   }
 
   void _navigateToOrderHistory(BuildContext context) {
@@ -159,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _navigateToAddresses(BuildContext context) {
-    // Navigate to Addresses Page
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => AddressesScreen()));
   }
 
   void _navigateToSupport(BuildContext context) {

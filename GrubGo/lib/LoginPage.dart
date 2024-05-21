@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'nav_bar.dart';
 import 'RegisterPage.dart';
+import 'home_screen.dart';
+import 'nav_bar.dart';
+import 'reset_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -40,8 +42,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.asset('assets/GrubGo.jpeg', height: 200),
-                SizedBox(height: 50),
+                Image.asset('assets/GrubGo.jpeg', height: 150),
+                SizedBox(height: 30),
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -71,9 +73,15 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => RegisterPage()));
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => ResetPasswordPage()));
                   },
-                  child: Text('Register if you don\'t have an account'),
+                  child: Text('Forgot Password?'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => RegisterPage()));
+                  },
+                  child: Text('Don\'t have an account? Register'),
                 ),
               ],
             ),
