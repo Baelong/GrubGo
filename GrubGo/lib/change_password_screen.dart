@@ -28,10 +28,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           password: _currentPasswordController.text,
         );
 
-        // Re-authenticate the user
         await user.reauthenticateWithCredential(credential);
 
-        // Update the password
         await user.updatePassword(_newPasswordController.text);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password updated successfully')));
         Navigator.of(context).pop();
@@ -46,12 +44,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFF001F3F),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Change Password', style: TextStyle(color: Colors.black)),
+        title: Text('Change Password', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
       ),
@@ -69,7 +67,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 onPressed: _changePassword,
                 child: Text('Change Password'),
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.black,
+                  primary:  Color(0xFF001F3F),
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   textStyle: TextStyle(fontSize: 16),
                 ),

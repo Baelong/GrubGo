@@ -41,8 +41,10 @@ class _ViewCartPageState extends State<ViewCartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        title: Text('Cart Details'),
+        backgroundColor: Color(0xFF001F3F), // Dark navy blue
+        title: Text('Cart Details', style: TextStyle(color: Colors.white)),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _getCartItemsStream(),
@@ -127,23 +129,30 @@ class _ViewCartPageState extends State<ViewCartPage> {
                     MaterialPageRoute(builder: (context) => McDonaldsMenuPage()),
                   );
                 },
-                child: Text('+ Add Items'),
+                child: Text('+ Add Items', style: TextStyle(color: Colors.black),),
               ),
               Text(
                 'Subtotal: \$${subtotal.toStringAsFixed(2)}',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CheckoutPage(), // Navigate to CheckoutPage
-                    ),
-                  );
-                },
-                child: Text('Go to Checkout'),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CheckoutPage(),
+                      ),
+                    );
+                  },
+                  child: Text('Go to Checkout'),
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                    textStyle: TextStyle(fontSize: 18),
+                    primary: Color(0xFF001F3F),
+                  ),
+                ),
               ),
             ],
           );

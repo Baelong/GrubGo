@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'view_cart_page.dart';
 import 'mcdonalds_menu.dart';
+import 'past_orders_screen.dart';
 
 class CartScreen extends StatefulWidget {
   @override
@@ -30,7 +31,21 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carts'),
+        backgroundColor: Color(0xFF001F3F), // Dark navy blue
+        title: Text('Carts', style: TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.history, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PastOrdersScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _getCartItemsStream(),
@@ -96,18 +111,23 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 );
                               },
-                              child: Text('View store'),
+                              child: Text('View store', style: TextStyle(color: Colors.black),),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ViewCartPage(),
-                                  ),
-                                );
-                              },
-                              child: Text('View cart'),
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewCartPage(),
+                                    ),
+                                  );
+                                },
+                                child: Text('View cart'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color(0xFF001F3F),
+                                ),
+                              ),
                             ),
                           ],
                         ),

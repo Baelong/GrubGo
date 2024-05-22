@@ -24,12 +24,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text('Reset Password', style: TextStyle(color: Colors.black)),
+        backgroundColor: Color(0xFF001F3F), // Dark navy blue
+        title: Text('Reset Password', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -44,7 +44,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
               ),
             ),
             SizedBox(height: 20),
@@ -52,7 +54,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               onPressed: _resetPassword,
               child: Text('Send Reset Email'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.black,
+                primary: Color(0xFF001F3F),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 textStyle: TextStyle(fontSize: 16),
                 shape: RoundedRectangleBorder(

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'address_search_screen.dart';
+import 'address_model.dart';
 
 class AddressesScreen extends StatefulWidget {
+  final bool isSelecting;
+
+  AddressesScreen({this.isSelecting = false});
+
   @override
   _AddressesScreenState createState() => _AddressesScreenState();
 }
@@ -13,27 +16,8 @@ class AddressesScreen extends StatefulWidget {
 class _AddressesScreenState extends State<AddressesScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: "AIzaSyC60Ado0xtCvhht-Bk_UA6kBnFf8lnFtgE");
 
-  void _addAddress() async {
-    Prediction? prediction = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: "AIzaSyC60Ado0xtCvhht-Bk_UA6kBnFf8lnFtgE",
-      mode: Mode.overlay,
-      language: "en",
-      components: [Component(Component.country, "us"), Component(Component.country, "ca")],
-    );
-
-    if (prediction != null) {
-      PlacesDetailsResponse detail = await _places.getDetailsByPlaceId(prediction.placeId!);
-      String address = detail.result.formattedAddress!;
-      setState(() {
-        _saveAddress(address);
-      });
-    }
-  }
-
-  Future<void> _saveAddress(String address) async {
+  Future<void> _addAddress(String address) async {
     User? user = _auth.currentUser;
     if (user != null) {
       await _firestore.collection('users').doc(user.uid).collection('addresses').add({
@@ -49,6 +33,19 @@ class _AddressesScreenState extends State<AddressesScreen> {
     }
   }
 
+  void _searchAddress() async {
+    final selectedAddress = await showSearch<String?>(
+      context: context,
+      delegate: AddressSearch(),
+    );
+
+    if (selectedAddress != null) {
+      setState(() {
+        _addAddress(selectedAddress);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     User? user = _auth.currentUser;
@@ -56,12 +53,12 @@ class _AddressesScreenState extends State<AddressesScreen> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text('Addresses', style: TextStyle(color: Colors.black)),
+        backgroundColor: Color(0xFF001F3F),
+        title: Text('Addresses', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -77,14 +74,32 @@ class _AddressesScreenState extends State<AddressesScreen> {
           }
           final addresses = snapshot.data!.docs;
           return ListView.builder(
+            padding: EdgeInsets.all(10.0),
             itemCount: addresses.length,
             itemBuilder: (context, index) {
-              final address = addresses[index];
-              return ListTile(
-                title: Text(address['address']),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => _deleteAddress(address.id),
+              final addressData = addresses[index];
+              final address = Address.fromFirestore(addressData.data() as Map<String, dynamic>, addressData.id);
+              return Card(
+                margin: EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                elevation: 2.0,
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  title: Text(
+                    address.address,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _deleteAddress(address.id),
+                  ),
+                  onTap: widget.isSelecting
+                      ? () {
+                    Navigator.pop(context, address);
+                  }
+                      : null,
                 ),
               );
             },
@@ -92,9 +107,9 @@ class _AddressesScreenState extends State<AddressesScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addAddress,
+        onPressed: _searchAddress,
         child: Icon(Icons.add),
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF001F3F),
       ),
     );
   }

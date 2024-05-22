@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'payment_model.dart';
+import 'payment_options_screen.dart';
+import 'address_model.dart';
+import 'addresses_screen.dart';
 
 class CheckoutPage extends StatefulWidget {
   @override
@@ -11,25 +15,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  String selectedAddressId = '';
-  String selectedPaymentMethodId = '';
+  Address? selectedAddress;
+  Payment? selectedPaymentMethod;
+  double subtotal = 0.0;
+  double taxes = 0.0;
+  double deliveryFee = 3.0;
+  double total = 0.0;
 
-  Stream<QuerySnapshot> _getAddressesStream() {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      return _firestore.collection('users').doc(user.uid).collection('addresses').snapshots();
-    } else {
-      return Stream.empty();
-    }
-  }
-
-  Stream<QuerySnapshot> _getPaymentMethodsStream() {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      return _firestore.collection('users').doc(user.uid).collection('payment_methods').snapshots();
-    } else {
-      return Stream.empty();
-    }
+  @override
+  void initState() {
+    super.initState();
+    _calculateTotal();
   }
 
   Stream<QuerySnapshot> _getCartItemsStream() {
@@ -41,11 +37,83 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
+  void _selectAddress() async {
+    final address = await Navigator.push<Address>(
+      context,
+      MaterialPageRoute(builder: (context) => AddressesScreen(isSelecting: true)),
+    );
+
+    if (address != null) {
+      setState(() {
+        selectedAddress = address;
+      });
+    }
+  }
+
+  void _selectPaymentMethod() async {
+    final payment = await Navigator.push<Payment>(
+      context,
+      MaterialPageRoute(builder: (context) => PaymentOptionsScreen(isSelecting: true)),
+    );
+
+    if (payment != null) {
+      setState(() {
+        selectedPaymentMethod = payment;
+      });
+    }
+  }
+
+  void _calculateTotal() {
+    _getCartItemsStream().listen((snapshot) {
+      double newSubtotal = snapshot.docs.fold(0.0, (sum, item) {
+        final data = item.data() as Map<String, dynamic>;
+        final itemPrice = (data['totalPrice'] ?? 0.0) as double;
+        return sum + itemPrice;
+      });
+
+      setState(() {
+        subtotal = newSubtotal;
+        taxes = subtotal * 0.15;
+        total = subtotal + taxes + deliveryFee;
+      });
+    });
+  }
+
+  void _placeOrder() async {
+    User? user = _auth.currentUser;
+    if (user != null && selectedAddress != null && selectedPaymentMethod != null) {
+      final cartSnapshot = await _getCartItemsStream().first;
+
+      final orderData = {
+        'address': selectedAddress!.toFirestore(),
+        'paymentMethod': selectedPaymentMethod!.toFirestore(),
+        'orderDate': FieldValue.serverTimestamp(),
+        'subtotal': subtotal,
+        'taxes': taxes,
+        'deliveryFee': deliveryFee,
+        'total': total,
+        'items': cartSnapshot.docs.map((doc) => doc.data()).toList(),
+      };
+
+      await _firestore.collection('users').doc(user.uid).collection('orders').add(orderData);
+
+      for (var doc in cartSnapshot.docs) {
+        await doc.reference.delete();
+      }
+
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.pushReplacementNamed(context, '/cart');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        title: Text('Checkout'),
+        backgroundColor: Color(0xFF001F3F), // Dark navy blue
+        title: Text('Checkout', style: TextStyle(color: Colors.white)),
       ),
       body: ListView(
         padding: EdgeInsets.all(16.0),
@@ -54,47 +122,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
             'Select Address',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          StreamBuilder<QuerySnapshot>(
-            stream: _getAddressesStream(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Center(child: Text('Something went wrong: ${snapshot.error}'));
-              }
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(child: Text('No saved addresses. Add a new address.'));
-              }
-
-              final addresses = snapshot.data!.docs;
-              return Column(
-                children: [
-                  ...addresses.map((address) {
-                    final data = address.data() as Map<String, dynamic>;
-                    return ListTile(
-                      title: Text(data['address']),
-                      leading: Radio<String>(
-                        value: address.id,
-                        groupValue: selectedAddressId,
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedAddressId = value!;
-                          });
-                        },
-                      ),
-                    );
-                  }).toList(),
-                  ListTile(
-                    leading: Icon(Icons.add),
-                    title: Text('Add New Address'),
-                    onTap: () {
-                      // Navigate to add new address page
-                    },
-                  ),
-                ],
-              );
-            },
+          ListTile(
+            title: Text(
+              selectedAddress != null
+                  ? selectedAddress!.address
+                  : 'No address selected',
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: _selectAddress,
+            ),
           ),
           SizedBox(height: 16),
           Text(
@@ -115,15 +152,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
               }
 
               final cartItems = snapshot.data!.docs;
-              double subtotal = cartItems.fold(0.0, (sum, item) {
-                final data = item.data() as Map<String, dynamic>;
-                return sum + (data['totalPrice'] ?? 0.0);
-              });
-
-              double taxes = subtotal * 0.1; // Assuming 10% tax rate
-              double deliveryFee = 5.0; // Assuming a flat delivery fee
-
-              double total = subtotal + taxes + deliveryFee;
 
               return Column(
                 children: [
@@ -164,58 +192,36 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           SizedBox(height: 16),
           Text(
-            'Select Payment Method',
+            'Payment Method',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          StreamBuilder<QuerySnapshot>(
-            stream: _getPaymentMethodsStream(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Center(child: Text('Something went wrong: ${snapshot.error}'));
-              }
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(child: Text('No saved payment methods. Add a new one.'));
-              }
-
-              final paymentMethods = snapshot.data!.docs;
-              return Column(
-                children: [
-                  ...paymentMethods.map((method) {
-                    final data = method.data() as Map<String, dynamic>;
-                    return ListTile(
-                      title: Text(data['cardNumber']),
-                      subtitle: Text(data['cardHolder']),
-                      leading: Radio<String>(
-                        value: method.id,
-                        groupValue: selectedPaymentMethodId,
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedPaymentMethodId = value!;
-                          });
-                        },
-                      ),
-                    );
-                  }).toList(),
-                  ListTile(
-                    leading: Icon(Icons.add),
-                    title: Text('Add New Payment Method'),
-                    onTap: () {
-                      // Navigate to add new payment method page
-                    },
-                  ),
-                ],
-              );
-            },
+          ListTile(
+            title: Text(
+              selectedPaymentMethod != null
+                  ? '**** **** **** ${selectedPaymentMethod!.cardNumber.substring(selectedPaymentMethod!.cardNumber.length - 4)}'
+                  : 'No payment method selected',
+            ),
+            subtitle: Text(
+              selectedPaymentMethod != null
+                  ? selectedPaymentMethod!.cardHolderName
+                  : 'Please select a payment method',
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: _selectPaymentMethod,
+            ),
           ),
           SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // Handle order placement
-            },
-            child: Text('Place Order'),
+          Center(
+            child: ElevatedButton(
+              onPressed: _placeOrder,
+              child: Text('Place Order'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 100, vertical: 16),
+                textStyle: TextStyle(fontSize: 18),
+                primary: Color(0xFF001F3F),
+              ),
+            ),
           ),
         ],
       ),

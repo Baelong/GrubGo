@@ -25,18 +25,14 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
           password: _currentPasswordController.text,
         );
 
-        // Re-authenticate the user
         await user.reauthenticateWithCredential(credential);
 
-        // Send email verification to the new email address
         await user.verifyBeforeUpdateEmail(_newEmailController.text);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('A verification link has been sent to the new email address. Please verify before changing the email.')));
 
-        // Listen for email verification and update Firestore
         FirebaseAuth.instance.userChanges().listen((user) async {
           if (user != null && user.email == _newEmailController.text && user.emailVerified) {
-            // Update email in Firestore
             await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
               'email': _newEmailController.text,
             });
@@ -56,12 +52,12 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFF001F3F),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Change Email', style: TextStyle(color: Colors.black)),
+        title: Text('Change Email', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
       ),
@@ -79,7 +75,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                 onPressed: _changeEmail,
                 child: Text('Change Email'),
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.black,
+                  primary: Color(0xFF001F3F),
                   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   textStyle: TextStyle(fontSize: 16),
                 ),

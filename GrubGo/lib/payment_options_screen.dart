@@ -5,6 +5,10 @@ import 'payment_model.dart';
 import 'payment_form.dart';
 
 class PaymentOptionsScreen extends StatefulWidget {
+  final bool isSelecting;
+
+  PaymentOptionsScreen({this.isSelecting = false});
+
   @override
   _PaymentOptionsScreenState createState() => _PaymentOptionsScreenState();
 }
@@ -41,12 +45,12 @@ class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text('Payment Options', style: TextStyle(color: Colors.black)),
+        backgroundColor: Color(0xFF001F3F),
+        title: Text('Payment Options', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -95,6 +99,11 @@ class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
                       ),
                     ],
                   ),
+                  onTap: widget.isSelecting
+                      ? () {
+                    Navigator.pop(context, payment);
+                  }
+                      : null,
                 ),
               );
             },
@@ -111,7 +120,7 @@ class _PaymentOptionsScreenState extends State<PaymentOptionsScreen> {
           }
         },
         child: Icon(Icons.add),
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0xFF001F3F),
       ),
     );
   }

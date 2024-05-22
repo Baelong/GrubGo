@@ -72,7 +72,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<String?> _uploadProfileImage(File image) async {
-    // Implement the method to upload the profile image to your storage and return the URL
     return null;
   }
 
@@ -115,12 +114,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text('Edit Profile', style: TextStyle(color: Colors.black)),
+        backgroundColor: Color(0xFF001F3F),
+        title: Text('Edit Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -142,7 +141,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           : (profileImageUrl != null
                           ? NetworkImage(profileImageUrl!)
                           : AssetImage('assets/pfp.jpg')) as ImageProvider,
-                      child: _profileImage == null ? Icon(Icons.camera_alt, color: Colors.white, size: 30) : null,
+                      child: _profileImage == null
+                          ? Icon(Icons.camera_alt, color: Colors.white, size: 30)
+                          : null,
                     ),
                   ),
                   SizedBox(height: 10),
@@ -167,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onPressed: _updateProfile,
               child: Text('Update Profile'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.black,
+                primary: Color(0xFF001F3F),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 textStyle: TextStyle(fontSize: 16),
                 shape: RoundedRectangleBorder(

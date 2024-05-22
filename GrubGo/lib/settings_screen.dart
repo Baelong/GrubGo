@@ -8,6 +8,7 @@ import 'profile_screen.dart';
 import 'change_password_screen.dart';
 import 'change_email_screen.dart';
 import 'payment_options_screen.dart';
+import 'past_orders_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -32,8 +33,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text('Settings', style: TextStyle(color: Colors.black)),
+        backgroundColor: Color(0xFF001F3F), // Dark navy blue
+        title: Text('Settings', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
       ),
@@ -158,7 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _navigateToOrderHistory(BuildContext context) {
-    // Navigate to Order History Page
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => PastOrdersScreen()));
   }
 
   void _navigateToAddresses(BuildContext context) {

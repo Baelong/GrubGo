@@ -76,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: _register,
                   child: Text('Register'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.black,
+                    primary: Color(0xFF001F3F),
                     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                     textStyle: TextStyle(fontSize: 16),
                   ),

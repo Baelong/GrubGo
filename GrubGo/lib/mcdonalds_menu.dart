@@ -34,7 +34,9 @@ class _McDonaldsMenuPageState extends State<McDonaldsMenuPage> {
     return DefaultTabController(
       length: 5,
       child: Scaffold(
+        backgroundColor: Color(0xFFE1E1E1),  // Setting background color
         appBar: AppBar(
+          backgroundColor: Color(0xFF001F3F),  // Dark navy blue color
           title: TextField(
             onChanged: (value) {
               setState(() {

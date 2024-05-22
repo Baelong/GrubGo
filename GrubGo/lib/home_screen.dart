@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'LoginPage.dart';
 import 'mcdonalds_menu.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,22 +16,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return _firestore.collection('restaurants').snapshots();
   }
 
-  void _signOut() async {
-    await _auth.signOut();
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => LoginPage()));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        title: Text('Home Screen'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: _signOut,
-          ),
-        ],
+        backgroundColor: Color(0xFF001F3F),  // Dark navy blue color
+        title: Text('GrubGo', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        elevation: 0,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _getRestaurantStream(),
@@ -69,19 +61,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.network(
-                          imageUrl,
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.network(
-                              'https://via.placeholder.com/150',
-                              height: 200,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            );
-                          },
+                        ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15.0),
+                            topRight: Radius.circular(15.0),
+                          ),
+                          child: Image.network(
+                            imageUrl,
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.network(
+                                'https://via.placeholder.com/150',
+                                height: 200,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(16.0),

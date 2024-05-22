@@ -53,12 +53,12 @@ class _PaymentFormState extends State<PaymentForm> {
     return Scaffold(
       backgroundColor: Color(0xFFE1E1E1),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text('Add/Edit Payment', style: TextStyle(color: Colors.black)),
+        backgroundColor: Color(0xFF001F3F),
+        title: Text('Add/Edit Payment', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -79,7 +79,7 @@ class _PaymentFormState extends State<PaymentForm> {
                 onPressed: _saveForm,
                 child: Text('Save'),
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.black,
+                  primary: Color(0xFF001F3F),
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   textStyle: TextStyle(fontSize: 16),
                   shape: RoundedRectangleBorder(

@@ -130,7 +130,8 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
     if (isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Item Details'),
+          backgroundColor: Color(0xFF001F3F),
+          title: Text('Item Details', style: TextStyle(color: Colors.white)),
         ),
         body: Center(
           child: CircularProgressIndicator(),
@@ -142,7 +143,8 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(itemData['name']),
+        backgroundColor: Color(0xFF001F3F),
+        title: Text(itemData['name'], style: TextStyle(color: Colors.white)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -290,16 +292,18 @@ class _ItemDetailsPageState extends State<ItemDetailsPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                _addToCart();
-                Navigator.pop(context);
-              },
-              child: Text('Add to Cart'),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                textStyle: TextStyle(fontSize: 20),
+            Center( // Center the button
+              child: ElevatedButton(
+                onPressed: () {
+                  _addToCart();
+                  Navigator.pop(context);
+                },
+                child: Text('Add to Cart'),
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFF001F3F),
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 50),
+                  textStyle: TextStyle(fontSize: 20),
+                ),
               ),
             ),
           ],
