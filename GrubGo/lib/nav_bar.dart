@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:badges/badges.dart' as badges;
 import 'home_screen.dart';
 import 'search_screen.dart';
 import 'cart_screen.dart';
@@ -11,6 +14,29 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   int _selectedIndex = 0;
+  int _cartCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateCartCount();
+  }
+
+  void _updateCartCount() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('cart')
+          .snapshots()
+          .listen((snapshot) {
+        setState(() {
+          _cartCount = snapshot.docs.isEmpty ? 0 : 1; // Update count based on unique restaurant orders
+        });
+      });
+    }
+  }
 
   static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
@@ -30,7 +56,7 @@ class _NavBarState extends State<NavBar> {
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -40,7 +66,14 @@ class _NavBarState extends State<NavBar> {
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: badges.Badge(
+              showBadge: _cartCount > 0,
+              badgeContent: Text(
+                '$_cartCount',
+                style: TextStyle(color: Colors.white),
+              ),
+              child: Icon(Icons.shopping_cart),
+            ),
             label: 'Cart',
           ),
           BottomNavigationBarItem(
